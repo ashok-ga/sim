@@ -47,11 +47,6 @@ This repository collects a set of robotic simulation environments and examples b
 ## 🛠 Prerequisites
 
 - **MuJoCo 3.x** installed  
-  - Set environment variables:  
-    ```bash
-    export MUJOCO_GL="egl"            # or glfw/osmesa
-    export MUJOCO_KEY_PATH=~/.mujoco/mjkey.txt
-    ```
 - **Python 3.8+**  
 - **Python packages**:
   ```bash
@@ -60,43 +55,18 @@ This repository collects a set of robotic simulation environments and examples b
   # or, for mujoco-py:
   pip install mujoco-py
   ```
-
----
-
-## ⚙️ Installation & Setup
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/<your-org>/<your-repo>.git
-   cd <your-repo>
-   ```
-
-2. **Verify MuJoCo license & library**  
-   Make sure `libmujoco.so` (or the equivalent) and your `mjkey.txt` are in `~/.mujoco/`.
-
-3. **Install Python deps**  
-   ```bash
-   pip install -r requirements.txt  # if you maintain one
-   ```
-
 ---
 
 ## ▶️ Running the MuJoCo Motor Test
 
-1. **Launch the example viewer**  
+1. **Run the scripted test**  
    ```bash
-   cd mujoco/models/motor_test
-   python test.py
-   ```
-   This will load `mjmodel.xml` and bring up the MuJoCo GUI. You can toggle playback, sliders, and inspect the meshes in the scene.
-
-2. **Run the scripted test**  
-   ```bash
-   python ../../../mujoco/scripts/motor_test.py
+   cd mujoco
+   python3 scripts/motor_test.py models/motor_test/test.xml
    ```
    This script programmatically steps the simulation, applies torques, and logs joint angles/forces.
 
-3. **Inspect the scene**  
+2. **Inspect the scene**  
    Open `scene.xml` in any MuJoCo‑compatible viewer, or inspect the raw XML files (`text.xml`, `test.xml`) to see how assets, bodies, joints, and actuators are defined.
 
 ---
