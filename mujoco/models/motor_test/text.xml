@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<mujoco model="Test">
+  <compiler angle="radian" inertiafromgeom="false"/>
+  <option gravity="0 0 -9.81" timestep="0.001"/>
+
+  <!-- assets -->
+  <asset>
+    <mesh name="base_link"      file="meshes/base_link.stl"      scale="0.001 0.001 0.001"/>
+    <mesh name="shaft_1"        file="meshes/shaft_1.stl"        scale="0.001 0.001 0.001"/>
+    <mesh name="shaft_holder_1" file="meshes/shaft_holder_1.stl" scale="0.001 0.001 0.001"/>
+    <mesh name="motor_1"        file="meshes/motor_1.stl"        scale="0.001 0.001 0.001"/>
+  </asset>
+
+  <worldbody>
+    <!-- floor -->
+    <geom type="plane" pos="0 0 0" size="10 10 0.1" rgba="0.8 0.8 0.8 1"/>
+
+    <!-- main directional light (softer) -->
+    <light directional="true"
+           pos="0 0 5"
+           dir="0 0 -1"
+           diffuse="0.6 0.6 0.6"
+           specular="0.1 0.1 0.1"
+           castshadow="true"/>
+
+    <!-- fill light to lift shadows -->
+    <light directional="false"
+           pos="2 2 3"
+           dir="0 0 -1"
+           diffuse="0.3 0.3 0.3"
+           specular="0 0 0"
+           castshadow="false"/>
+
+    <!-- base_link -->
+    <body name="base_link" pos="0 0 0">
+      <inertial
+        pos="0.0004208459566384093 -0.00044118953072505465 0.19492272776918843"
+        mass="20.48580845402666"
+        fullinertia="2.220232 0.000808 -0.00497 1.624764 0.003649 1.140571"/>
+      <geom type="mesh" mesh="base_link" pos="0 0 0" quat="1 0 0 0"/>
+      <geom type="mesh" mesh="base_link" pos="0 0 0" quat="1 0 0 0" contype="0" conaffinity="0"/>
+
+      <!-- motor_1 -->
+      <body name="motor_1" pos="-0.009823 -0.001851 0.825665">
+        <inertial
+          pos="0.028557231053538294 -0.00003864820265166375 0.00001537512316851508"
+          mass="1.058015460717901"
+          fullinertia="0.000397 -0.000001 0.0 0.000489 -0.000002 0.000486"/>
+        <geom type="mesh" mesh="motor_1" pos="0.009823 0.001851 -0.825665" quat="1 0 0 0"/>
+        <geom type="mesh" mesh="motor_1" pos="0.009823 0.001851 -0.825665" quat="1 0 0 0" contype="0" conaffinity="0"/>
+
+        <!-- shaft_holder_1 with hinge -->
+        <body name="shaft_holder_1" pos="0.0605 0 0">
+          <joint name="revolute_2" type="hinge" axis="1 0 0"/>
+          <inertial
+            pos="0.020465972265897622 -0.000006465197970995486 0.021946176397610095"
+            mass="0.13589194771648735"
+            fullinertia="0.00013 0.0 -0.00002 0.00011 0.0 0.000057"/>
+          <geom type="mesh" mesh="shaft_holder_1" pos="-0.050677 0.001851 -0.825665" quat="1 0 0 0"/>
+          <geom type="mesh" mesh="shaft_holder_1" pos="-0.050677 0.001851 -0.825665" quat="1 0 0 0" contype="0" conaffinity="0"/>
+
+          <!-- shaft_1 fixed -->
+          <body name="shaft_1" pos="0.025 0 0.024002">
+            <inertial
+              pos="0.00000032666438987138946 0.000008262286244737531 0.29999988098059216"
+              mass="0.5672592000000012"
+              fullinertia="0.017037 0.0 0.0 0.017037 0.0 0.000039"/>
+            <geom type="mesh" mesh="shaft_1" pos="-0.075677 0.001851 -0.849667" quat="1 0 0 0"/>
+            <geom type="mesh" mesh="shaft_1" pos="-0.075677 0.001851 -0.849667" quat="1 0 0 0" contype="0" conaffinity="0"/>
+          </body>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+
+  <!-- actuators (must be outside worldbody) -->
+  <actuator>
+    <motor joint="revolute_2" gear="100" ctrlrange="-1 1"/>
+  </actuator>
+</mujoco>
+

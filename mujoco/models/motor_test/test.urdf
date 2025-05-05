@@ -1,0 +1,132 @@
+<?xml version="1.0"?>
+<robot name="Test">
+
+  <!-- ========== base_link ========== -->
+  <link name="base_link">
+    <inertial>
+      <origin xyz="0.0004208459566384093 -0.00044118953072505465 0.19492272776918843" rpy="0 0 0"/>
+      <mass value="20.48580845402666"/>
+      <inertia 
+        ixx="2.220232" 
+        iyy="1.624764" 
+        izz="1.140571" 
+        ixy="0.000808" 
+        iyz="0.003649" 
+        ixz="-0.00497"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="/meshes/base_link.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="/meshes/base_link.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <!-- ========== shaft_1 ========== -->
+  <link name="shaft_1">
+    <inertial>
+      <origin xyz="3.2666438987138946e-07 8.262286244737531e-06 0.29999988098059216" rpy="0 0 0"/>
+      <mass value="0.5672592000000012"/>
+      <inertia 
+        ixx="0.017037" 
+        iyy="0.017037" 
+        izz="3.9e-05" 
+        ixy="-0.0" 
+        iyz="-0.0" 
+        ixz="-0.0"/>
+    </inertial>
+    <visual>
+      <origin xyz="-0.075677 0.001851 -0.849667" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="/meshes/shaft_1.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="-0.075677 0.001851 -0.849667" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="/meshes/shaft_1.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <!-- ========== shaft_holder_1 ========== -->
+  <link name="shaft_holder_1">
+    <inertial>
+      <origin xyz="0.020465972265897622 -6.465197970995486e-06 0.021946176397610095" rpy="0 0 0"/>
+      <mass value="0.13589194771648735"/>
+      <inertia 
+        ixx="0.00013" 
+        iyy="0.00011" 
+        izz="5.7e-05" 
+        ixy="0.0" 
+        iyz="0.0" 
+        ixz="-2e-05"/>
+    </inertial>
+    <visual>
+      <origin xyz="-0.050677 0.001851 -0.825665" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="/meshes/shaft_holder_1.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="-0.050677 0.001851 -0.825665" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="/meshes/shaft_holder_1.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <!-- ========== motor_1 ========== -->
+  <link name="motor_1">
+    <inertial>
+      <origin xyz="0.028557231053538294 -3.864820265166375e-05 1.537512316851508e-05" rpy="0 0 0"/>
+      <mass value="1.058015460717901"/>
+      <inertia 
+        ixx="0.000397" 
+        iyy="0.000489" 
+        izz="0.000486" 
+        ixy="-1e-06" 
+        iyz="-2e-06" 
+        ixz="0.0"/>
+    </inertial>
+    <visual>
+      <origin xyz="0.009823 0.001851 -0.825665" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="/meshes/motor_1.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0.009823 0.001851 -0.825665" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="/meshes/motor_1.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <!-- ========== joints ========== -->
+  <joint name="rigid_1" type="fixed">
+    <origin xyz="0.025 0.0 0.024002" rpy="0 0 0"/>
+    <parent link="shaft_holder_1"/>
+    <child  link="shaft_1"/>
+  </joint>
+
+  <joint name="revolute_2" type="continuous">
+    <origin xyz="0.0605 0.0 0.0" rpy="0 0 0"/>
+    <parent link="motor_1"/>
+    <child  link="shaft_holder_1"/>
+    <axis  xyz="1.0 -0.0 0.0"/>
+  </joint>
+
+  <joint name="rigid_3" type="fixed">
+    <origin xyz="-0.009823 -0.001851 0.825665" rpy="0 0 0"/>
+    <parent link="base_link"/>
+    <child  link="motor_1"/>
+  </joint>
+
+</robot>

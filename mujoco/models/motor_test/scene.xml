@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<mujoco model="Test_with_scene">
+  <compiler angle="radian"/>
+
+  <!-- 1) Pull in your robot definition -->
+  <include file="text.xml"/>
+
+  <!-- 2) Statistics panel in the upper-left -->
+  <statistic center="0 0 0.43" extent="0.85" meansize="0.05"/>
+
+  <!-- 3) Global visual settings -->
+  <visual>
+    <!-- soften the headlight and add a little ambient fill -->
+    <headlight diffuse="0.6 0.6 0.6" ambient="0.3 0.3 0.3" specular="0 0 0"/>
+    <!-- subtle atmospheric haze -->
+    <rgba haze="0.15 0.25 0.35 1"/>
+    <!-- camera defaults -->
+    <global azimuth="160" elevation="-10"/>
+    <!-- nicer shadows -->
+    <quality shadowsize="8192"/>
+  </visual>
+
+  <!-- 4) Skybox + groundplane textures -->
+  <asset>
+    <!-- gradient sky -->
+    <texture type="skybox"
+             builtin="gradient"
+             rgb1="0.3 0.5 0.7"
+             rgb2="0 0 0"
+             width="512" height="3072"/>
+    <!-- checker-board ground -->
+    <texture type="2d"
+             name="groundplane"
+             builtin="checker"
+             mark="edge"
+             rgb1="0.2 0.3 0.4"
+             rgb2="0.1 0.2 0.3"
+             markrgb="0.8 0.8 0.8"
+             width="300" height="300"/>
+    <material name="groundplane"
+              texture="groundplane"
+              texuniform="true"
+              texrepeat="5 5"
+              reflectance="0.2"/>
+  </asset>
+
+  <!-- 5) Floor & one extra light in the world -->
+  <worldbody>
+    <!-- subtle fill light from above -->
+    <light pos="0 0 1.5" dir="0 0 -1" directional="true"/>
+    <!-- checker floor -->
+    <geom name="floor"
+          type="plane"
+          size="0 0 0.05"
+          material="groundplane"/>
+  </worldbody>
+</mujoco>
+

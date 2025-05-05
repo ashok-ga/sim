@@ -1,0 +1,50 @@
+<mujoco model="Test">
+  <!-- disable automatic inertia-from-geometry -->
+  <compiler angle="radian"/>
+
+  <option timestep="0.001"/>
+
+  <asset>
+    <mesh name="base_link" content_type="model/stl" file="meshes/base_link.stl" scale="0.001 0.001 0.001"/>
+    <mesh name="shaft_1" content_type="model/stl" file="meshes/shaft_1.stl" scale="0.001 0.001 0.001"/>
+    <mesh name="shaft_holder_1" content_type="model/stl" file="meshes/shaft_holder_1.stl" scale="0.001 0.001 0.001"/>
+    <mesh name="motor_1" content_type="model/stl" file="meshes/motor_1.stl" scale="0.001 0.001 0.001"/>
+  </asset>
+
+  <worldbody>
+    <geom size="10 10 0.1" type="plane" rgba="0.8 0.8 0.8 1"/>
+    <light pos="0 0 5" dir="0 0 -1" directional="true" diffuse="0.6 0.6 0.6" specular="0.1 0.1 0.1"/>
+    <light pos="2 2 3" dir="0 0 -1" castshadow="false" diffuse="0.3 0.3 0.3" specular="0 0 0"/>
+    <body name="base_link">
+      <inertial pos="0.000420846 -0.00044119 0.194923" mass="20.4858" diaginertia="2.22023 1.62476 1.14057"/>
+      <geom type="mesh" mesh="base_link"/>
+      <geom type="mesh" contype="0" conaffinity="0" mesh="base_link"/>
+      <body name="motor_1" pos="-0.009823 -0.001851 0.825665">
+        <inertial pos="0.0285572 -3.86482e-05 1.53751e-05" mass="1.05802" diaginertia="0.000397 0.000489 0.000486"/>
+        <geom pos="0.009823 0.001851 -0.825665" quat="1 0 0 0" type="mesh" mesh="motor_1"/>
+        <geom pos="0.009823 0.001851 -0.825665" quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" mesh="motor_1"/>
+        <body name="shaft_holder_1" pos="0.0605 0 0">
+          <inertial pos="0.020466 -6.4652e-06 0.0219462" mass="0.135892" diaginertia="0.00013 0.00011 5.7e-05"/>
+          <joint name="revolute_2" pos="0 0 0" axis="1 0 0"/>
+          <geom pos="-0.050677 0.001851 -0.825665" type="mesh" mesh="shaft_holder_1"/>
+          <geom pos="-0.050677 0.001851 -0.825665" type="mesh" contype="0" conaffinity="0" mesh="shaft_holder_1"/>
+          <body name="shaft_1" pos="0.025 0 0.024002">
+            <inertial pos="3.2666e-07 8.2623e-06 0.3" mass="0.567259" diaginertia="0.017037 0.017037 3.9e-05"/>
+            <geom pos="-0.075677 0.001851 -0.849667" type="mesh" mesh="shaft_1"/>
+            <geom pos="-0.075677 0.001851 -0.849667" type="mesh" contype="0" conaffinity="0" mesh="shaft_1"/>
+          </body>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+
+  <contact>
+    <exclude body1="base_link" body2="shaft_holder_1"/>
+    <exclude body1="motor_1" body2="shaft_holder_1"/>
+  </contact>
+
+  <actuator>
+    <general name="rev2_P" joint="revolute_2" ctrlrange="-3.14 3.14" biastype="affine" gainprm="30" biasprm="0 -30"/>
+    <general name="rev2_D" joint="revolute_2" ctrlrange="-25 25" biastype="affine" gainprm="3.5" biasprm="0 0 -3.5"/>
+  </actuator>
+</mujoco>
