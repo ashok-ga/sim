@@ -55,25 +55,6 @@ This repository collects a set of robotic simulation environments and examples b
   # or, for mujoco-py:
   pip install mujoco-py
   ```
-
----
-
-## ⚙️ Installation & Setup
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/<your-org>/<your-repo>.git
-   cd <your-repo>
-   ```
-
-2. **Verify MuJoCo license & library**  
-   Make sure `libmujoco.so` (or the equivalent) and your `mjkey.txt` are in `~/.mujoco/`.
-
-3. **Install Python deps**  
-   ```bash
-   pip install -r requirements.txt  # if you maintain one
-   ```
-
 ---
 
 ## ▶️ Running the MuJoCo Motor Test
