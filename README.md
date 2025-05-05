@@ -47,11 +47,6 @@ This repository collects a set of robotic simulation environments and examples b
 ## 🛠 Prerequisites
 
 - **MuJoCo 3.x** installed  
-  - Set environment variables:  
-    ```bash
-    export MUJOCO_GL="egl"            # or glfw/osmesa
-    export MUJOCO_KEY_PATH=~/.mujoco/mjkey.txt
-    ```
 - **Python 3.8+**  
 - **Python packages**:
   ```bash
