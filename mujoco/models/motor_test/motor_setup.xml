@@ -1,0 +1,106 @@
+<?xml version="1.0"?>
+<mujoco model="Test scene">
+  <compiler angle="radian"/>
+  <option timestep="0.002" gravity="0 0 -9.81"/>
+
+  <!-- Default properties for joints and geoms -->
+  <default>
+    <joint
+      armature="0.01"
+      damping="1"
+      frictionloss="0.1"/>
+    <geom contype="1" conaffinity="1"/>
+  </default>
+
+  <!-- Assets: model meshes, scene textures, and materials -->
+  <asset>
+    <mesh name="base_link"       file="meshes/base_link.stl"       scale="0.001 0.001 0.001"/>
+    <mesh name="motor_1"         file="meshes/motor_1.stl"         scale="0.001 0.001 0.001"/>
+    <mesh name="shaft_holder_1"  file="meshes/shaft_holder_1.stl"  scale="0.001 0.001 0.001"/>
+    <mesh name="shaft_1"         file="meshes/shaft_1.stl"         scale="0.001 0.001 0.001"/>
+
+    <material name="base_link_mat"    rgba="0.7 0.7 0.7 1" specular="0.2" shininess="0.3"/>
+    <material name="motor_mat"        rgba="0 0 0 1"     specular="0.5" shininess="0.8"/>
+    <material name="shaft_holder_mat" rgba="0 1 0 1"     specular="0.3" shininess="0.5"/>
+    <material name="shaft_mat"        rgba="0 0 1 1"     specular="0.3" shininess="0.5"/>
+
+    <texture type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0 0 0" width="512" height="3072"/>
+    <texture type="2d" name="groundplane" builtin="checker" mark="edge"
+             rgb1="0.2 0.3 0.4" rgb2="0.1 0.2 0.3" markrgb="0.8 0.8 0.8"
+             width="200" height="200"/>
+    <material name="groundplane" texture="groundplane" texuniform="true" texrepeat="4 4" reflectance="0.2"/>
+  </asset>
+
+  <statistic center="0 0 0.5" extent="0.6" meansize="0.04"/>
+
+  <visual>
+    <headlight diffuse="0.6 0.6 0.6" ambient="0.3 0.3 0.3" specular="0.1 0.1 0.1"/>
+    <rgba haze="0.15 0.25 0.35 1"/>
+    <global azimuth="180" elevation="-20"/>
+    <quality shadowsize="4096"/>
+  </visual>
+
+  <worldbody>
+    <body name="base_link" pos="0 0 0">
+      <inertial pos="0.000420846 -0.00044119 0.19492273"
+                quat="1 0 0 0"
+                mass="20.4858"
+                diaginertia="2.220232 1.624764 1.140571"/>
+      <geom type="mesh" mesh="base_link" contype="0" conaffinity="0" material="base_link_mat" pos="0 0 0"/>
+
+      <body name="motor_1" pos="-0.009823 -0.001851 0.825665">
+        <inertial pos="0.02855723 -0.0000386482 0.0000153751"
+                  quat="1 0 0 0"
+                  mass="1.05802"
+                  diaginertia="0.000397 0.000489 0.000486"/>
+        <geom type="mesh" mesh="motor_1" contype="0" conaffinity="0" material="motor_mat" pos="0.009823 0.001851 -0.825665"/>
+
+        <body name="shaft_holder_1" pos="0.0605 0 0">
+          <!-- hinge joint with damping and Coulomb friction -->
+          <joint
+            name="revolute_2"
+            type="hinge"
+            axis="1 0 0"
+            armature="0.007614"
+            damping="0.5"
+            frictionloss="0.3"
+            range="-1.74533 0.523599"/>
+          <inertial pos="0.02046597 -0.0000064652 0.02194618"
+                    quat="1 0 0 0"
+                    mass="0.135892"
+                    diaginertia="0.00013 0.00011 0.000057"/>
+          <geom type="mesh" mesh="shaft_holder_1" contype="0" conaffinity="0" material="shaft_holder_mat" pos="-0.050677 0.001851 -0.825665"/>
+
+          <body name="shaft_1" pos="0.025 0 0.024002">
+            <inertial pos="0.0000003267 0.0000082623 0.3"
+                      quat="1 0 0 0"
+                      mass="0.5672592"
+                      diaginertia="0.017037 0.017037 0.000039"/>
+            <geom type="mesh" mesh="shaft_1" contype="0" conaffinity="0" material="shaft_mat" pos="-0.075677 0.001851 -0.849667"/>
+          </body>
+        </body>
+      </body>
+    </body>
+
+    <light pos="0 0 2" dir="0 0 -1" directional="true"/>
+    <geom name="floor" type="plane" size="0 0 0.05" material="groundplane"/>
+  </worldbody>
+
+  <contact>
+    <exclude body1="motor_1" body2="shaft_holder_1"/>
+    <exclude body1="shaft_holder_1" body2="base_link"/>
+  </contact>
+
+  <actuator>
+    <position name="revolute_2_act" joint="revolute_2" kp="30" kv="3.5" gear="1" ctrlrange="-6.2832 6.2832"/>
+  </actuator>
+
+  <sensor>
+    <jointpos joint="revolute_2" name="revolute_2_pos"/>
+    <jointvel joint="revolute_2" name="revolute_2_vel"/>
+  </sensor>
+
+  <keyframe>
+    <key name="home" ctrl="0"/>
+  </keyframe>
+</mujoco>

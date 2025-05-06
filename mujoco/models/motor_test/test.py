@@ -10,11 +10,11 @@ from mujoco import mj_name2id, mjtObj
 
 def main():
     """
-    run_model.py
+    motor_test_sine.py
 
-    Load the MJCF model and run a control loop that applies PD via actuators,
-    prints contact sensor reading, and prints the angle of 'revolute_2'.
-    Allows full rotation by expanding actuator ctrlrange.
+    Load the MJCF model and run a control loop that applies a sinusoidal
+    position command via a single position actuator, prints debug info,
+    and prints the angle of 'revolute_2'.
     """
     if len(sys.argv) != 2:
         print(f"Usage: {sys.argv[0]} path/to/model.xml")
@@ -27,70 +27,54 @@ def main():
 
     # Load model and data
     model = mujoco.MjModel.from_xml_path(xml_path)
-    data = mujoco.MjData(model)
+    data  = mujoco.MjData(model)
 
-    # Identify actuators for PD control
-    try:
-        iP = mj_name2id(model, mjtObj.mjOBJ_ACTUATOR, "rev2_P")
-        iD = mj_name2id(model, mjtObj.mjOBJ_ACTUATOR, "rev2_D")
-    except Exception:
-        print("Actuators 'rev2_P' or 'rev2_D' not found. PD control disabled.")
-        iP = iD = None
-
-    # Expand actuator range to full rotation (±2π)
-    if iP is not None:
-        model.actuator_ctrlrange[iP, :] = np.array([-2*np.pi, 2*np.pi])
-    if iD is not None:
-        model.actuator_ctrlrange[iD, :] = np.array([-2*np.pi, 2*np.pi])
-
-    # Identify contact sensor
-    try:
-        s_idx = mj_name2id(model, mjtObj.mjOBJ_SENSOR, "shaft_holder_contact")
-    except Exception:
-        print("Sensor 'shaft_holder_contact' not found. Contact printing disabled.")
-        s_idx = None
+    # Identify the position actuator
+    act_name = "revolute_2_act"
+    act_id = mj_name2id(model, mjtObj.mjOBJ_ACTUATOR, act_name)
+    if act_id < 0:
+        print(f"Actuator '{act_name}' not found. Position control disabled.")
+        act_id = None
+    else:
+        lo, hi = model.actuator_ctrlrange[act_id]
+        print(f"Found actuator '{act_name}' (id={act_id}), ctrl range: [{lo:.3f}, {hi:.3f}]")
 
     # Identify joint for angle printing
-    try:
-        j_idx = mj_name2id(model, mjtObj.mjOBJ_JOINT, "revolute_2")
-        qpos_index = model.jnt_qposadr[j_idx]
-    except Exception:
+    j_idx = mj_name2id(model, mjtObj.mjOBJ_JOINT, "revolute_2")
+    if j_idx < 0:
         print("Joint 'revolute_2' not found. Angle printing disabled.")
         qpos_index = None
+    else:
+        qpos_index = model.jnt_qposadr[j_idx]
+        print(f"Monitoring joint 'revolute_2' (id={j_idx}) at qpos index {qpos_index}")
 
-    # Launch viewer
+    # Launch the viewer
     viewer = launch(model, data)
 
-    # PD control parameters
-    amplitude = 3.14  # rad
-    frequency = 1.0   # Hz
+    # Sinusoidal command parameters
+    amplitude = np.pi / 2   # peak position (rad)
+    frequency = 0.5         # Hz
     t0 = time.time()
     step = 0
-    print(f"Running simulation for model: {xml_path}")
-    
+    print(f"Running sinusoidal test on model: {xml_path}")
+
+    # Main loop
     while viewer.is_running():
         # Compute time
         t = time.time() - t0
 
-        # Apply PD via actuators
-        if iP is not None and iD is not None:
-            pos_des = amplitude * np.sin(2 * np.pi * frequency * t)
-            vel_des = amplitude * 2 * np.pi * frequency * np.cos(2 * np.pi * frequency * t)
-            data.ctrl[iP] = pos_des
-            data.ctrl[iD] = vel_des
+        # Apply desired position command
+        if act_id is not None:
+            desired_pos = amplitude * np.sin(2 * np.pi * frequency * t)
+            data.ctrl[act_id] = desired_pos
 
-        # Step simulation
+        # Step simulation (integrates data.qpos)
         mujoco.mj_step(model, data)
 
-        # Print contact sensor force
-        if s_idx is not None:
-            contact_force = data.sensordata[s_idx]
-            print(f"Step {step}: Contact force = {contact_force:.3f}")
-
-        # Print joint angle
-        if qpos_index is not None:
-            angle = data.qpos[qpos_index]
-            print(f"Step {step}: revolute_2 angle = {angle:.4f} rad")
+        # Read back actual position and print
+        if act_id is not None and qpos_index is not None:
+            actual_pos = data.qpos[qpos_index]
+            print(f"Step {step}: cmd={desired_pos:.4f} rad, actual={actual_pos:.4f} rad")
 
         # Render
         viewer.sync()
@@ -101,4 +85,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
