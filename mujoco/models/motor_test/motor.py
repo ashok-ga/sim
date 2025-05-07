@@ -38,7 +38,7 @@ def main():
     logger.start()
 
     # Control loop parameters
-    ctrl_freq = 100.0               # Hz
+    ctrl_freq = 50.0               # Hz
     sim_dt    = model.opt.timestep  # e.g. 0.002
     steps_per_ctrl = max(1, int(round(1.0 / (ctrl_freq * sim_dt))))
 

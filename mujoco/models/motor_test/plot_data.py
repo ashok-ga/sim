@@ -25,15 +25,31 @@ def main():
     # Load data
     times, cmds, qpos = load_csv(csv_path)
 
+    # Compute Mean Squared Error
+    errors = [(c - p)**2 for c, p in zip(cmds, qpos)]
+    mse = sum(errors) / len(errors) if errors else float('nan')
+    print(f"Mean Squared Error: {mse:.6f} rad^2")
+
     # Create figure and axes
     fig, ax = plt.subplots(figsize=(8, 4))
-    ax.plot(times, cmds, label='Command (rad)', color='red')
-    ax.plot(times, qpos, label='Position (rad)', color='blue')
+    ax.plot(times, cmds, label='Command (rad)')
+    ax.plot(times, qpos, label='Position (rad)')
     ax.set_xlabel('Time (s)')
     ax.set_ylabel('Angle (rad)')
     ax.set_title('Motor Command vs. Measured Position')
     ax.legend()
     ax.grid(True)
+
+    # Annotate MSE on plot
+    ax.text(
+        0.98, 0.02,
+        f'MSE = {mse:.6f} rad^2',
+        transform=ax.transAxes,
+        ha='right', va='bottom',
+        fontsize=10,
+        bbox=dict(facecolor='white', alpha=0.5, edgecolor='none')
+    )
+
     plt.tight_layout()
 
     # Close on 'q' key press

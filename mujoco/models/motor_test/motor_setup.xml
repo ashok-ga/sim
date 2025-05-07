@@ -6,23 +6,25 @@
 
   <!-- Default properties for joints and geoms -->
   <default>
-    <joint armature="0.08" damping="1" frictionloss="0.5"/>
+    <joint armature="0.0" damping="0.0" frictionloss="0.0"/>
     <geom contype="1" conaffinity="1"/>
   </default>
 
   <!-- Assets: model meshes, scene textures, and materials -->
   <asset>
     <!-- Model meshes -->
-    <mesh name="base_link" file="meshes/base_link.stl" scale="0.001 0.001 0.001"/>
-    <mesh name="motor_1" file="meshes/motor_1.stl" scale="0.001 0.001 0.001"/>
-    <mesh name="shaft_holder_1" file="meshes/shaft_holder_1.stl" scale="0.001 0.001 0.001"/>
-    <mesh name="shaft_1" file="meshes/shaft_1.stl" scale="0.001 0.001 0.001"/>
+    <mesh name="base_link"       file="meshes/base_link.stl"       scale="0.001 0.001 0.001"/>
+    <mesh name="motor_1"         file="meshes/motor_1.stl"         scale="0.001 0.001 0.001"/>
+    <mesh name="shaft_holder_1"  file="meshes/shaft_holder_1.stl"  scale="0.001 0.001 0.001"/>
+    <mesh name="shaft_1"         file="meshes/shaft_1.stl"         scale="0.001 0.001 0.001"/>
+    <mesh name="load_1"          file="meshes/load_1.stl"          scale="0.001 0.001 0.001"/>
 
-    <!-- Materials for model parts -->
-    <material name="base_link_mat" rgba="0.7 0.7 0.7 1" specular="0.2" shininess="0.3"/>
-    <material name="motor_mat" rgba="0 0 0 1" specular="0.5" shininess="0.8"/>
-    <material name="shaft_holder_mat" rgba="0 1 0 1" specular="0.3" shininess="0.5"/>
-    <material name="shaft_mat" rgba="0 0 1 1" specular="0.3" shininess="0.5"/>
+    <!-- Materials -->
+    <material name="base_link_mat"    rgba="0.7 0.7 0.7 1" specular="0.2" shininess="0.3"/>
+    <material name="motor_mat"        rgba="0 0 0 1"       specular="0.5" shininess="0.8"/>
+    <material name="shaft_holder_mat" rgba="0 1 0 1"       specular="0.3" shininess="0.5"/>
+    <material name="shaft_mat"        rgba="0 0 1 1"       specular="0.3" shininess="0.5"/>
+    <material name="load_mat"         rgba="0.75 0.75 0.75 1" specular="0.3" shininess="0.6"/>
 
     <!-- Scene textures -->
     <texture type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0 0 0" width="512" height="3072"/>
@@ -32,7 +34,7 @@
     <material name="groundplane" texture="groundplane" texuniform="true" texrepeat="4 4" reflectance="0.2"/>
   </asset>
 
-  <!-- Scene statistics and visual settings -->
+  <!-- Visual settings -->
   <statistic center="0 0 0.5" extent="0.6" meansize="0.04"/>
   <visual>
     <headlight diffuse="0.6 0.6 0.6" ambient="0.3 0.3 0.3" specular="0.1 0.1 0.1"/>
@@ -60,7 +62,6 @@
         <geom type="mesh" mesh="motor_1" contype="0" conaffinity="0" material="motor_mat" pos="0.009823 0.001851 -0.825665"/>
 
         <body name="shaft_holder_1" pos="0.0605 0 0">
-          <!-- Hinge joint aligned at holder origin -->
           <joint name="revolute_2" type="hinge" axis="1 0 0" pos="0 0 0" frictionloss="0.1"/>
           <inertial pos="0.02046597 -0.0000064652 0.02194618"
                     quat="1 0 0 0"
@@ -74,35 +75,41 @@
                       mass="0.5672592"
                       diaginertia="0.017037 0.017037 0.000039"/>
             <geom type="mesh" mesh="shaft_1" contype="0" conaffinity="0" material="shaft_mat" pos="-0.075677 0.001851 -0.849667"/>
+
+            <!-- MuJoCo does not support explicit fixed joints. -->
+            <!-- The following nested body replaces the URDF <joint type='fixed'>Rigid 4</joint> -->
+            <body name="load_1" pos="2e-06 8e-05 0.6">
+              <inertial pos="0.0008070412934903515 0.00017571907174825834 -0.03750011901940753"
+                        quat="1 0 0 0"
+                        mass="5.525231866204256"
+                        diaginertia="0.007329 0.007138 0.009287"/>
+              <geom type="mesh" mesh="load_1" contype="0" conaffinity="0" material="load_mat" pos="-0.075679 0.001771 -1.449667"/>
+            </body>
+
           </body>
         </body>
       </body>
-
     </body>
 
-    <!-- Lighting and floor -->
     <light pos="0 0 2" dir="0 0 -1" directional="true"/>
     <geom name="floor" type="plane" pos="0 0 0" size="10 10 0.05" material="groundplane"/>
   </worldbody>
 
-  <!-- Contact exclusions -->
   <contact>
     <exclude body1="motor_1" body2="shaft_holder_1"/>
     <exclude body1="shaft_holder_1" body2="base_link"/>
+    <exclude body1="load_1" body2="base_link"/>
   </contact>
 
-  <!-- Actuator -->
   <actuator>
-    <position name="revolute_2_act" joint="revolute_2" kp="30" kv="3.5" gear="1" ctrlrange="-6.2832 6.2832"/>
+    <position name="revolute_2_act" joint="revolute_2" kp="100" kv="7.5" gear="1" ctrlrange="-6.2832 6.2832"/>
   </actuator>
 
-  <!-- Sensors -->
   <sensor>
     <jointpos joint="revolute_2" name="revolute_2_pos"/>
     <jointvel joint="revolute_2" name="revolute_2_vel"/>
   </sensor>
 
-  <!-- Keyframe -->
   <keyframe>
     <key name="home" ctrl="0"/>
   </keyframe>
