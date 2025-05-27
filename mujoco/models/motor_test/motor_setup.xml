@@ -102,7 +102,7 @@
   </contact>
 
   <actuator>
-    <position name="revolute_2_act" joint="revolute_2" kp="100" kv="7.5" gear="1" ctrlrange="-6.2832 6.2832"/>
+    <position name="revolute_2_act" joint="revolute_2" kp="90" kv="2" gear="1" ctrlrange="-6.2832 6.2832"/>
   </actuator>
 
   <sensor>
