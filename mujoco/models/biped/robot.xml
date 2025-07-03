@@ -1,0 +1,223 @@
+<mujoco model="robot">
+    <default>
+        <default class="visual">
+            <geom type="mesh" density="0" material="metal" contype="0" conaffinity="0" />
+        </default>
+    </default>
+
+    <option iterations="3" ls_iterations="5" timestep="0.002" integrator="Euler">
+        <flag eulerdamp="disable" />
+    </option>
+
+    <visual>
+        <headlight diffuse="0.6 0.6 0.6" ambient="0.3 0.3 0.3" specular="0.1 0.1 0.1"/>
+        <rgba haze="0.15 0.25 0.35 1"/>
+        <global azimuth="180" elevation="-20"/>
+        <quality shadowsize="4096"/>
+    </visual>
+
+    <worldbody>
+        <geom name="floor" type="plane" size="5 5 0.1" pos="0 0 0" material="groundplane"/>
+        <light pos="0 0 5" dir="0 0 -1"
+            diffuse="0.8 0.8 0.8"
+            specular="0.2 0.2 0.2"
+            ambient="0.3 0.3 0.3"
+            castshadow="true"
+            attenuation="0.7 0.05 0"/>
+        <light pos="3 3 4" dir="-1 -1 -1"
+            diffuse="0.5 0.5 0.5"
+            specular="0.1 0.1 0.1"
+            ambient="0.2 0.2 0.2"/>
+        <camera name="render_cam" pos="-0.073 3.732 1.098"
+                xyaxes="-1.000 -0.020 -0.000 0.001 -0.026 1.000" />
+        <body pos="0 0 0.91" name="pelvis">
+            <freejoint />
+            <geom class="visual" mesh="base_link" mass="0.0" material="silver"/>
+            <inertial pos="-0.054 -0.0 -0.053" quat="0.707 -0.003 0.003 0.707"
+                diaginertia="0.007 0.025 0.025" mass="3.112" />
+            <geom type="sphere" size="0.025" pos="-0.054 0 0" mass="5"/>
+            <site name="imu" type="box" pos="-0.05 0 0" size="0.01 0.01 0.01"/>
+            <!-- Left leg -->
+            <body pos="-0.054303 0.104943 -0.066909" name="fa_coupler">
+                <joint name="j1" type="hinge" pos="0 0 0" axis="-0.0 -0.866025 0.5"
+                    armature="0.0056" frictionloss="0.3" range="-30 30"/>
+                <geom class="visual" mesh="link_1_1" mass="0.0" pos="0.054303 -0.104943 0.066909" material="gray"/>
+                <inertial pos="-0.002 0.042 -0.031" quat="0.659 0.260 -0.658 -0.256" mass="0.972"
+                    diaginertia="0.001 0.001 0.002" />
+                <body pos="0.02845 0.047111 -0.035401" name="ar_coupler">
+                    <joint name="j3" type="hinge" pos="0 0 0" axis="-1 0 0" armature="0.0056"
+                        frictionloss="0.3" range="-18 18"/>
+                    <inertial pos="-0.022 0.009 -0.070" quat="0.212 -0.343 0.914 0.036" mass="1.170" diaginertia="0.002 0.002 0.002" />
+                    <geom class="visual" mesh="link_3_1" pos="0.025853 -0.152054 0.10231" material="silver"/>
+                    <body pos="-0.022875 0.0075 -0.1089" name="thigh_link_cf">
+                        <joint name="j5" type="hinge" pos="0 0 0" axis="0 0 1" armature="0.0056"
+                            frictionloss="0.3" range="-9 9"/>
+                        <inertial pos="0.000 -0.004 -0.198" quat="0.507 0.492 -0.494 0.506" mass="1.577" diaginertia="0.002 0.015 0.016" />
+                        <geom class="visual" mesh="link_5_1" pos="0.048728 -0.159554 0.21121" material="gray"/>
+                        <body pos="0.0 0.0273 -0.258" name="shin_link">
+                            <site name="left_knee_site"/>
+                            <joint name="j7" type="hinge" pos="0 0 0" axis="0 -1 0"
+                                armature="0.0056" frictionloss="0.3" range="-90 0"/>
+                            <inertial pos="-0.004 -0.027 -0.170" quat="0.012 0.710 -0.014 0.704" mass="2.385" diaginertia="0.002 0.024 0.025" />
+                            <geom class="visual" mesh="link_7_1" pos="0.048728 -0.186854 0.46921" material="silver"/>
+                            <body pos="0.0 -0.017 -0.391" name="axis_coupler">
+                                <joint name="j10" type="hinge" pos="0 0 0" axis="0 -1 0"
+                                    armature="0.0056" frictionloss="0.3" range="-30 30"/>
+                                <inertial pos="-0.000 -0.010 -0.007" quat="0.707 0.707 0.006 -0.006" mass="0.103" diaginertia="0.0001 0.0001 0.0001" />
+                                <geom class="visual" mesh="link_12_1"
+                                    pos="0.048728 -0.169854 0.86021" material="silver"/>
+                                <body pos="0.0121 -0.01 -0.01" name="foot">
+                                    <joint name="j12" type="hinge" pos="0 0 0" axis="-1 0 0"
+                                        armature="0.0056" frictionloss="0.3" range="-9 9"/>
+                                    <site name="left_foot_site"/>
+                                    <inertial pos="0.000 -0.000 -0.020" quat="0.999 0.000 0.033 -0.000" mass="0.246" diaginertia="0.00001 0.001 0.001" />
+                                    <geom class="visual" mesh="link_10_1"
+                                        pos="0.036628 -0.159854 0.87021" material="black"/>
+                                    <!-- Left foot contact points -->
+                                    <geom name="l_f_l" type="sphere" size="0.01"
+                                        pos="0.08 0.03 -0.03" rgba="1 1 1 1" friction="1.0"
+                                        mass="0.0" />
+                                    <geom name="l_f_r" type="sphere" size="0.01"
+                                        pos="0.08 -0.03 -0.03" rgba="1 1 1 1" friction="1.0"
+                                        mass="0.0" />
+                                    <geom name="l_b_l" type="sphere" size="0.01"
+                                        pos="-0.08 0.03 -0.03" rgba="1 1 1 1" friction="1.0"
+                                        mass="0.0" />
+                                    <geom name="l_b_r" type="sphere" size="0.01"
+                                        pos="-0.08 -0.03 -0.03" rgba="1 1 1 1" friction="1.0"
+                                        mass="0.0" />
+                                </body>
+                            </body>
+                        </body>
+                    </body>
+                </body>
+            </body>
+            <!-- Right leg -->
+            <body pos="-0.054303 -0.104943 -0.066909" name="fa_coupler_mirror">
+                <joint name="j2" type="hinge" pos="0 0 0" axis="-0.0 0.866025 0.5" armature="0.0056"
+                    frictionloss="0.3" range="-30 30"/>
+                <inertial pos="-0.003 -0.042 -0.031" quat="0.195 0.694 0.178 0.670" mass="0.972" diaginertia="0.001 0.001 0.002" />
+                <geom class="visual" mesh="link_2_1" pos="0.054303 0.104943 0.066909" material="gray"/>
+                <body pos="0.02625 -0.047111 -0.035401" name="ar_coupler_mirror">
+                    <joint name="j4" type="hinge" pos="0 0 0" axis="1 0 0" armature="0.0056"
+                        frictionloss="0.3" range="-18 18"/>
+                    <inertial pos="-0.025 -0.009 -0.068" quat="0.053 0.954 -0.184 0.229" mass="1.170" diaginertia="0.002 0.002 0.002" />
+                    <geom class="visual" mesh="link_4_1" pos="0.028053 0.152054 0.10231" material="silver"/>
+                    <body pos="-0.027125 -0.0075 -0.1089" name="thigh_link_cf_mirror">
+                        <joint name="j6" type="hinge" pos="0 0 0" axis="0 0 1" armature="0.0056"
+                            frictionloss="0.3" range="-9 9"/>
+                        <inertial pos="0.000 -0.004 -0.198" quat="0.507 0.492 -0.494 0.506" mass="1.577" diaginertia="0.002 0.015 0.016" />
+                        <geom class="visual" mesh="link_6_1" pos="0.055178 0.159554 0.21121" material="gray"/>
+                        <body pos="0.0 0.0271 -0.258" name="shin_link_mirror">
+                            <site name="right_knee_site"/>
+                            <joint name="j8" type="hinge" pos="0 0 0" axis="0 -1 0"
+                                armature="0.0056" frictionloss="0.3" range="-90 0"/>
+                            <inertial pos="-0.004 -0.027 -0.170" quat="0.012 0.710 -0.014 0.704" mass="2.385" diaginertia="0.002 0.024 0.025" />
+                            <geom class="visual" mesh="link_8_1" pos="0.055178 0.132454 0.46921" material="silver"/>
+                            <body pos="0.0 -0.017 -0.391" name="axis_coupler_mirror">
+                                <joint name="j9" type="hinge" pos="0 0 0" axis="0 1 0"
+                                    armature="0.0056" frictionloss="0.3" range="-30 30"/>
+                                <inertial pos="-0.000 -0.010 -0.007" quat="0.707 0.707 0.006 -0.006" mass="0.103" diaginertia="0.0001 0.0001 0.0001" />
+                                <geom class="visual" mesh="link_11_1"
+                                    pos="0.055178 0.149454 0.86021" material="silver"/>
+                                <body pos="0.0121 -0.01 -0.01" name="foot_mirror">
+                                    <site name="right_foot_site"/>
+                                    <joint name="j11" type="hinge" pos="0 0 0" axis="-1 0 0"
+                                        armature="0.0056" frictionloss="0.3" range="-9 9"/>
+                                    <inertial pos="0.007 0.0 -0.020" quat="0.999 0.000 0.033 -0.000" mass="0.246" diaginertia="0.00001 0.001 0.001" />
+                                    <geom class="visual" mesh="link_9_1"
+                                        pos="0.043078 0.159454 0.87021" material="black"/>
+                                    <!-- Right foot contact points -->
+                                    <geom name="r_f_l" type="sphere" size="0.01"
+                                        pos="0.08 0.03 -0.03" rgba="1 1 1 1" friction="1.0"
+                                        mass="0.0" />
+                                    <geom name="r_f_r" type="sphere" size="0.01"
+                                        pos="0.08 -0.03 -0.03" rgba="1 1 1 1" friction="1.0"
+                                        mass="0.0" />
+                                    <geom name="r_b_l" type="sphere" size="0.01"
+                                        pos="-0.08 0.03 -0.03" rgba="1 1 1 1" friction="1.0"
+                                        mass="0.0" />
+                                    <geom name="r_b_r" type="sphere" size="0.01"
+                                        pos="-0.08 -0.03 -0.03" rgba="1 1 1 1" friction="1.0"
+                                        mass="0.0" />
+                                </body>
+                            </body>
+                        </body>
+                    </body>
+                </body>
+            </body>
+        </body>
+    </worldbody>
+
+
+    <contact>
+    </contact>
+    <actuator>
+        <position name="h1_left" joint="j1" kp="90" kv="8.5" forcelimited="true" forcerange="-90 90" />
+        <position name="h2_left" joint="j3" kp="90" kv="8.5" forcelimited="true" forcerange="-50 50" />
+        <position name="h3_left" joint="j5" kp="90" kv="8.5" forcelimited="true" forcerange="-50 50" />
+        <position name="knee_left" joint="j7" kp="90" kv="8.5" forcelimited="true" forcerange="-50 50" />
+        <position name="ankle_left_pitch" joint="j10" kp="50" kv="5.5" forcelimited="true" forcerange="-9 9" />
+        <position name="ankle_left_roll" joint="j12" kp="50" kv="5.5" forcelimited="true" forcerange="-9 9" />
+
+        <position name="h1_right" joint="j2" kp="90" kv="8.5" forcelimited="true" forcerange="-90 90" />
+        <position name="h2_right" joint="j4" kp="90" kv="8.5" forcelimited="true" forcerange="-50 50" />
+        <position name="h3_right" joint="j6" kp="90" kv="8.5" forcelimited="true" forcerange="-50 50" />
+        <position name="knee_right" joint="j8" kp="90" kv="8.5" forcelimited="true" forcerange="-50 50" />
+        <position name="ankle_right_pitch" joint="j9" kp="50" kv="5.5" forcelimited="true" forcerange="-9 9" />
+        <position name="ankle_right_roll" joint="j11" kp="50" kv="5.5" forcelimited="true" forcerange="-9 9" />
+    </actuator>
+    <sensor>
+        <gyro site="imu" name="gyro" />
+        <accelerometer site="imu" name="accelerometer" />
+        <framepos objtype="site" objname="imu" name="torso_pos" />
+        <framezaxis objtype="site" objname="imu" name="gravity_vector"/>
+        <framequat objtype="site" objname="imu" name="orientation" />
+        <framelinvel objtype="site" objname="left_foot_site" name="left_foot_global_linvel" />
+        <framezaxis objtype="site" objname="left_foot_site" name="left_foot_z_axis_vec" />
+        <framepos objtype="site" objname="left_foot_site" name="left_foot_pos" />
+        <framepos objtype="site" objname="left_knee_site" name="left_knee_pos" />
+        <framelinvel objtype="site" objname="right_foot_site" name="right_foot_global_linvel" />
+        <framezaxis objtype="site" objname="right_foot_site" name="right_foot_z_axis_vec" />
+        <framepos objtype="site" objname="right_foot_site" name="right_foot_pos" />
+        <framepos objtype="site" objname="right_knee_site" name="right_knee_pos" />
+    </sensor>
+    <asset>
+        <material name="metal" rgba="0.3 0.3 0.3 1" />
+        <mesh name="base_link" file="meshes/base_link.stl"
+            scale="0.001 0.001 0.001" />
+        <mesh name="link_1_1" file="meshes/link_1_1.stl"
+            scale="0.001 0.001 0.001" />
+        <mesh name="link_2_1" file="meshes/link_2_1.stl"
+            scale="0.001 0.001 0.001" />
+        <mesh name="link_3_1" file="meshes/link_3_1.stl"
+            scale="0.001 0.001 0.001" />
+        <mesh name="link_4_1" file="meshes/link_4_1.stl"
+            scale="0.001 0.001 0.001" />
+        <mesh name="link_5_1" file="meshes/link_5_1.stl"
+            scale="0.001 0.001 0.001" />
+        <mesh name="link_6_1" file="meshes/link_6_1.stl"
+            scale="0.001 0.001 0.001" />
+        <mesh name="link_7_1" file="meshes/link_7_1.stl"
+            scale="0.001 0.001 0.001" />
+        <mesh name="link_8_1" file="meshes/link_8_1.stl"
+            scale="0.001 0.001 0.001" />
+        <mesh name="link_9_1" file="meshes/link_9_1.stl"
+            scale="0.001 0.001 0.001" />
+        <mesh name="link_10_1" file="meshes/link_10_1.stl"
+            scale="0.001 0.001 0.001" />
+        <mesh name="link_11_1" file="meshes/link_11_1.stl"
+            scale="0.001 0.001 0.001" />
+        <mesh name="link_12_1" file="meshes/link_12_1.stl"
+            scale="0.001 0.001 0.001" />
+        <material name="silver"    rgba="0.6 0.6 0.6 1" specular="0.6" shininess="0.8"/>
+        <material name="gray"  rgba="0.1 0.1 0.1 1" specular="0.4" shininess="0.4"/>
+        <material name="black"  rgba="0.1 0.1 0.1 1"  specular="0.0" shininess="0.2"/>
+
+        <texture name="skybox" type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0 0 0" width="512" height="3072"/>
+        <texture name="groundplane_tex" type="2d" builtin="checker" mark="edge"
+             rgb1="0.2 0.3 0.4" rgb2="0.1 0.2 0.3" markrgb="0.8 0.8 0.8"
+             width="200" height="200"/>
+        <material name="groundplane" texture="groundplane_tex" texuniform="true" texrepeat="4 4" reflectance="0.35" rgba="0.3 0.3 0.35 1"/>
+    </asset>
+</mujoco>

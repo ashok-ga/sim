@@ -2,8 +2,8 @@
 """
 motor.py
 
-Runs the revolute_2 hinge defined in `motor_setup.xml` for 10 seconds at 100 Hz,
-driven by a smooth sinusoid (±π at 1 Hz), and logs timestamped commands and
+Runs the revolute_2 hinge defined in `test.xml` for 30 seconds at 50 Hz,
+driven by a smooth sinusoid (±π/3 at 1 Hz), and logs timestamped commands and
 measured positions to CSV via multiprocessing.
 """
 import os
@@ -25,12 +25,20 @@ def logger_proc(log_queue, csv_path):
 def main():
     # Locate files
     here     = os.path.dirname(os.path.abspath(__file__))
-    xml_path = os.path.join(here, 'motor_setup.xml')
+    xml_path = os.path.join(here, 'test.xml')
     csv_path = os.path.join(here, 'motor_log.csv')
 
     # Load model & data
     model = mujoco.MjModel.from_xml_path(xml_path)
     data  = mujoco.MjData(model)
+
+    # Debug: print all joint and actuator names and mappings
+    print("Joints:")
+    for i in range(model.njnt):
+        print(f"  {i}: {mujoco.mj_id2name(model, mujoco.mjtObj.mjOBJ_JOINT, i)} (type={model.jnt_type[i]})")
+    print("Actuators:")
+    for i in range(model.nu):
+        print(f"  {i}: {mujoco.mj_id2name(model, mujoco.mjtObj.mjOBJ_ACTUATOR, i)} (joint_id={model.actuator_trnid[i, 0]})")
 
     # Start logger
     log_queue = mp.Queue()
@@ -43,23 +51,24 @@ def main():
     steps_per_ctrl = max(1, int(round(1.0 / (ctrl_freq * sim_dt))))
 
     # Sinusoid parameters
-    freq      = 1.0      # Hz (how many full ±π cycles per second)
-    amplitude = np.pi    # radians
+    freq      = 0.5      # Hz (how many full ±π/3 cycles per second)
+    amplitude = np.pi/6    # radians
 
     # Run with non-blocking viewer
     with mujoco.viewer.launch_passive(model, data) as viewer:
         t0 = time.time()
         while viewer.is_running():
             t = time.time() - t0
-            # stop after 10 seconds
-            if t >= 5.0:
+            # stop after 30 seconds
+            if t >= 130.0:
                 break
 
             # compute smooth sine command
             cmd = amplitude * np.sin(2 * np.pi * freq * t)
+            print(cmd)
             data.ctrl[0] = cmd
 
-            # step simulation to hold 100 Hz control
+            # step simulation to hold 50 Hz control
             for _ in range(steps_per_ctrl):
                 mujoco.mj_step(model, data)
 
