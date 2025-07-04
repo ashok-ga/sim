@@ -1,0 +1,108 @@
+<mujoco model="Test scene">
+
+    <compiler angle="radian" />
+    <option timestep="0.002" gravity="0 0 -9.81" />
+    <default>
+        <joint armature="0.0" damping="0.0" frictionloss="0.0" />
+        <geom contype="1" conaffinity="1" />
+    </default>
+
+    <!-- Merge all needed meshes and materials from both files here -->
+    <asset>
+        <!-- Model meshes -->
+        <mesh name="base_link_mesh" file="meshes/base_link.stl" scale="0.001 0.001 0.001" />
+        <mesh name="link_shaft_1_mesh" file="meshes/link_shaft_1.stl" scale="0.001 0.001 0.001" />
+        <mesh name="load_1_mesh" file="meshes/load_1.stl" scale="0.001 0.001 0.001" />
+        <mesh name="shaft_holder_1_mesh" file="meshes/shaft_holder_1.stl" scale="0.001 0.001 0.001" />
+        <!-- Add any extra meshes from the new scene if you use them -->
+        <!-- Materials -->
+        <material name="silver" rgba="0.75 0.75 0.75 1" />
+        <!-- Extra materials from new scene if needed -->
+        <material name="groundplane" texture="groundplane" texuniform="true" texrepeat="4 4"
+            reflectance="0.2" />
+        <!-- Textures from new scene if you want skybox/ground -->
+        <texture type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0 0 0" width="512"
+            height="3072" />
+        <texture type="2d" name="groundplane" builtin="checker" mark="edge"
+            rgb1="0.2 0.3 0.4" rgb2="0.1 0.2 0.3" markrgb="0.8 0.8 0.8"
+            width="200" height="200" />
+    </asset>
+
+    <!-- Visual & statistic settings -->
+    <statistic center="0 0 0.5" extent="0.6" meansize="0.04" />
+    <visual>
+        <headlight diffuse="0.6 0.6 0.6" ambient="0.3 0.3 0.3" specular="0.1 0.1 0.1" />
+        <rgba haze="0.15 0.25 0.35 1" />
+        <global azimuth="180" elevation="-20" />
+        <quality shadowsize="4096" />
+    </visual>
+
+    <!-- World body -->
+    <worldbody>
+        <!-- Robot (from your previous conversion, one branch) -->
+        <body name="base_link" pos="0 0 0">
+            <inertial pos="0.0026107933704624746 -0.0004382706040496737 0.22878390583377264"
+                mass="62.810240947483"
+                diaginertia="7.791204 6.060359 3.32805" />
+            <geom type="mesh"
+                mesh="base_link_mesh"
+                pos="0 0 0"
+                material="silver" />
+            <body name="shaft_holder_1" pos="0.059 0.0 0.865319">
+                <joint name="Revolute_6" type="hinge" axis="-1 0 0" />
+                <inertial pos="0.023688401403048218 -0.0008219615569868211 -0.03540203569279343"
+                    mass="0.1697881382218178"
+                    diaginertia="0.000182 0.000176 8e-05" />
+                <geom type="mesh"
+                    mesh="shaft_holder_1_mesh"
+                    pos="-0.059 -0.0 -0.865319"
+                    material="silver" />
+                <body name="link_shaft_1" pos="0.031005 -0.001851 -0.043657">
+                    <inertial pos="-0.090005 0.001851 -0.821662"
+                        mass="0.0"
+                        diaginertia="0 0 0" />
+                    <geom type="mesh"
+                        mesh="link_shaft_1_mesh"
+                        pos="-0.090005 0.001851 -0.821662"
+                        material="silver" />
+                    <body name="load_1" pos="0.01 0.0 -0.508419">
+                        <inertial
+                            pos="0.03000032312420027 1.1376968177441438e-08 1.3697894057917992e-07"
+                            mass="4.001549329526012"
+                            diaginertia="0.009612 0.006006 0.006006" />
+                        <geom type="mesh"
+                            mesh="load_1_mesh"
+                            pos="-0.100005 0.001851 -0.313243"
+                            material="silver" />
+                    </body>
+                </body>
+            </body>
+        </body>
+        <!-- Light and floor (from new scene) -->
+        <light pos="0 0 2" dir="0 0 -1" directional="true" />
+        <geom name="floor" type="plane" pos="0 0 0" size="10 10 0.05" material="groundplane" />
+    </worldbody>
+
+    <!-- Contact, actuator, sensor, keyframe sections from new scene -->
+    <contact>
+        <exclude body1="base_link" body2="shaft_holder_1" />
+        <exclude body1="shaft_holder_1" body2="link_shaft_1" />
+        <exclude body1="link_shaft_1" body2="load_1" />
+        <!-- Add more if you have more adjacent links -->
+    </contact>
+
+    <actuator>
+        <!-- Example actuator, adapt as needed -->
+        <position name="Revolute_6_act" joint="Revolute_6" kp="150" kv="5.0" gear="1"
+            ctrlrange="-6.2832 6.2832" />
+    </actuator>
+
+    <sensor>
+        <jointpos joint="Revolute_6" name="Revolute_6_pos" />
+        <jointvel joint="Revolute_6" name="Revolute_6_vel" />
+    </sensor>
+
+    <keyframe>
+        <key name="home" ctrl="0" />
+    </keyframe>
+</mujoco>
